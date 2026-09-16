@@ -1,0 +1,17 @@
+{
+  "$schema": "https://www.schemastore.org/claude-code-marketplace.json",
+  "name": "wrap-up",
+  "description": "Close a session so the next one starts smarter. A knowledge-maintenance pass, not a transcript summary.",
+  "owner": {
+    "name": "Gopal Agrawal",
+    "url": "https://github.com/goagrawal-genai"
+  },
+  "plugins": [
+    {
+      "name": "wrap-up",
+      "description": "Probe, distill, consolidate, refresh the handoff, verify. Ends the session leaving the entry point true.",
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}
