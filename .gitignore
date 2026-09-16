@@ -1,0 +1,22 @@
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Never publish local agent state, transcripts, or session data.
+# This repo ships ONE thing: the skill. Nothing session-specific belongs here.
+.claude/
+projects/
+todos/
+shell-snapshots/
+statsig/
+history.jsonl
+*.session.json
+*.transcript.*
+
+# Scratch
+tmp/
+scratch/
+*.local.md
