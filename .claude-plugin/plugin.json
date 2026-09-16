@@ -1,0 +1,20 @@
+{
+  "name": "wrap-up",
+  "version": "0.1.0",
+  "description": "Close a session so the next one starts smarter: probe the un-routed queues, distill only durable signal, consolidate instead of appending, refresh the handoff doc, and verify every write.",
+  "author": {
+    "name": "Gopal Agrawal",
+    "url": "https://github.com/goagrawal-genai"
+  },
+  "homepage": "https://github.com/goagrawal-genai/wrap-up",
+  "license": "MIT",
+  "keywords": [
+    "wrap-up",
+    "handoff",
+    "session",
+    "memory",
+    "context",
+    "knowledge-management",
+    "productivity"
+  ]
+}
