@@ -1,0 +1,65 @@
+name: plugin-load-check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Manifests are valid JSON
+        run: |
+          for f in .claude-plugin/plugin.json .claude-plugin/marketplace.json; do
+            python3 -c "import json,sys; json.load(open('$f'))" && echo "ok  $f"
+          done
+
+      - name: Manifest names agree with the skill directory
+        run: |
+          python3 - <<'PY'
+          import json, sys, pathlib
+          plugin = json.load(open('.claude-plugin/plugin.json'))
+          market = json.load(open('.claude-plugin/marketplace.json'))
+          name = plugin['name']
+          errs = []
+          if market['name'] != name:
+              errs.append(f"marketplace.name {market['name']!r} != plugin.name {name!r}")
+          if not any(p['name'] == name for p in market.get('plugins', [])):
+              errs.append(f"no plugin entry named {name!r} in marketplace.json")
+          if not pathlib.Path(f'skills/{name}/SKILL.md').is_file():
+              errs.append(f"missing skills/{name}/SKILL.md")
+          for e in errs:
+              print("ERROR:", e)
+          sys.exit(1 if errs else 0)
+          PY
+
+      - name: SKILL.md has valid frontmatter with name + description
+        run: |
+          python3 - <<'PY'
+          import sys, pathlib, re
+          p = pathlib.Path('skills/wrap-up/SKILL.md')
+          text = p.read_text(encoding='utf-8')
+          if not text.startswith('---\n'):
+              print("ERROR: SKILL.md must open with YAML frontmatter"); sys.exit(1)
+          fm = text.split('---', 2)[1]
+          missing = [k for k in ('name:', 'description:') if k not in fm]
+          if missing:
+              print("ERROR: frontmatter missing", missing); sys.exit(1)
+          name = re.search(r'^name:\s*(\S+)', fm, re.M).group(1)
+          if name != 'wrap-up':
+              print(f"ERROR: frontmatter name {name!r} != 'wrap-up'"); sys.exit(1)
+          print(f"ok  frontmatter: name={name}, description {len(fm)} chars")
+          PY
+
+      - name: No accidental local or private paths committed
+        run: |
+          # Character classes keep this pattern from matching its own source line.
+          if grep -rInE '/[U]sers/|/[h]ome/[a-z]|[C]:\\Users' \
+               --include='*.md' --include='*.json' --include='*.yml' . ; then
+            echo "ERROR: an absolute local path is committed — scrub it"; exit 1
+          fi
+          echo "ok  no absolute local paths"
